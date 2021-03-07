@@ -112,15 +112,7 @@
       }
 //sort and solve "()"
       function sortz($str){
-        $pow = strpos($str, "^");
-        if ($pow != false){
-          $next = get_next_number($str, $pow+1);
-          $prev = get_prev_number($str, $pow-1);
-          $sub = $prev[0]."^".$next[0];
-          fill($sub);
-          $buff = calculate();
-          $str = str_replace($sub, $buff,  $str);
-          }
+
         $start = strpos($str, "(");
         $end = strpos($str, ")");
         if($start!=false || $end!=false){
@@ -130,6 +122,15 @@
           $buff = calculate();
           $str = str_replace("(".$sub.")", $buff, $str);
         }
+        $pow = strpos($str, "^");
+        if ($pow != false){
+          $next = get_next_number($str, $pow+1);
+          $prev = get_prev_number($str, $pow-1);
+          $sub = $prev[0]."^".$next[0];
+          fill($sub);
+          $buff = calculate();
+          $str = str_replace($sub, $buff,  $str);
+          }
         return $str;
       }
     echo $problem." = ";
@@ -144,3 +145,4 @@
 
   </body>
 </html>
+
