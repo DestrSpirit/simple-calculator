@@ -15,7 +15,7 @@
         $args_arr = array();
         $sign_arr = array();
         $buff_arr = array();
-
+//fill arrays from str
       function fill($problem){
         $GLOBALS['args_arr'] = array();
         $GLOBALS['sign_arr'] = array();
@@ -29,7 +29,7 @@
             array_push($GLOBALS['sign_arr'], $problem[$i]);
         }
       }
-
+//returns next numerical value in array
       function get_next_number($str, $i){
         $num = "";
         for( ; $i < strlen($str); $i++){
@@ -45,7 +45,7 @@
         }
         return array($num, $i);
       }
-
+//solve binary expression
       function answer($num1, $num2, $sign){
         $a = 0;
         switch ($sign) {
@@ -66,7 +66,7 @@
         }
         return $a;
       }
-
+//calculate args and signs arrays
       function calculate(){
         $args_arr = $GLOBALS['args_arr'];
         $sign_arr = $GLOBALS['sign_arr'];
@@ -85,7 +85,7 @@
         }
         return $args_arr[$priority[$i-1]];
       }
-
+//sort and solve "()"
       function sortz($str){
         $start = strpos($str, "(");
         $end = strpos($str, ")");
