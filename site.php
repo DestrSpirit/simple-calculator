@@ -9,105 +9,101 @@
       <input type="text" name="problem">
       <br>
     </form>
-    Answer: <?php
-              $problem = $_POST["problem"];
-              echo $problem." = ";
-              $num1 = ""; $op1 = "";
-              $num2 = ""; $op2 = "";
-              $num3 = ""; $op3 = "";
-              $num4 = "11";
-              if($problem != null)
-          for($i = 0; $i < strlen($problem); $i++){
-                if($problem[$i] == " ")
-                  continue;
-                if ($op1 == "")
-                if(is_numeric($problem[$i])){
-                  $num1 = $num1 . $problem[$i];
-                  continue;
-                } else {
-                  $op1 = $problem[$i];
-                  continue;
-                }
-                if ($op2 == "")
-                if(is_numeric($problem[$i]) ){
-                  $num2 .= $problem[$i];
-                  continue;
-                } else {
-                  $op2 = $problem[$i];
-                  continue;
-                }
-                if ($op3 == "")
-                if(is_numeric($problem[$i])){
-                  $num3 .= $problem[$i];
-                  continue;
-                } else {
-                  $op3 = $problem[$i];
-                  continue;
-                }
-                if(is_numeric($problem[$i])){
-                  $num4 .= $problem[$i];
-                  continue;
-                } else {
-                  echo "ERROR";
-                  break;
-                }
-              }
-              $num1 = intval($num1);
-              $num2 = intval($num2);
-              $num3 = intval($num3);
-              $num4 = intval($num4);
-            switch ($op1) {
-              case "+":
-                $num2 = $num1 + $num2;
-                break;
-              case "-":
-                $num2 = $num1 - $num2;
-                break;
-              case "*":
-                $num2 = $num1 * $num2;
-                break;
-              case "/":
-                $num2 = $num1 / $num2;
-                break;
-              default:
-                $num2 = $num1;
-                break;
-            }
-            switch ($op2) {
-              case "+":
-                $num3 = $num2 + $num3;
-                break;
-              case "-":
-                $num3 = $num2 - $num3;
-                break;
-                case "*":
-                  $num3 = $num2 * $num3;
-                  break;
-                case "/":
-                  $num3 = $num2 / $num3;
-                  break;
-              default:
-                $num3 = $num2;
-                break;
-            }
-            switch ($op3) {
-              case "+":
-                $num4 = $num3 + $num4;
-                break;
-              case "-":
-                $num4 = $num3 - $num4;
-                break;
-                case "*":
-                  $num4 = $num3 * $num4;
-                  break;
-                case "/":
-                  $num4 = $num3 / $num4;
-                  break;
-              default:
-                $num4 = $num3;
-                break;
-            }
-            echo $num4;
+
+        Answer: <?php
+        $problem = $_POST["problem"];
+        $args_arr = array();
+        $sign_arr = array();
+        $buff_arr = array();
+
+      function fill($problem){
+        $GLOBALS['args_arr'] = array();
+        $GLOBALS['sign_arr'] = array();
+        if($problem != null)
+        for($i = 0; $i < strlen($problem); $i++){
+          $buff_arr = get_next_number($problem, $i);
+          $i = $buff_arr[1];
+          if($buff_arr[0] != "")
+            array_push($GLOBALS['args_arr'] , $buff_arr[0]);
+          else
+            array_push($GLOBALS['sign_arr'], $problem[$i]);
+        }
+      }
+
+      function get_next_number($str, $i){
+        $num = "";
+        for( ; $i < strlen($str); $i++){
+          if($str[$i] == " ")
+            continue;
+          if(is_numeric($str[$i]) || $str[$i] =="."){
+            $num = $num . $str[$i];
+            continue;
+          } else
+            if($num != "")
+            $i--;
+            break;
+        }
+        return array($num, $i);
+      }
+
+      function answer($num1, $num2, $sign){
+        $a = 0;
+        switch ($sign) {
+        case "+":
+          $a = $num1 + $num2;
+          break;
+        case "-":
+          $a = $num1 - $num2;
+          break;
+        case "*":
+          $a = $num1 * $num2;
+          break;
+        case "/":
+          $a = $num1 / $num2;
+          break;
+        default:
+          break;
+        }
+        return $a;
+      }
+
+      function calculate(){
+        $args_arr = $GLOBALS['args_arr'];
+        $sign_arr = $GLOBALS['sign_arr'];
+        $priority = array();
+        for($i = 0; $i<count($sign_arr); $i++){
+          if ($sign_arr[$i] == "*" || $sign_arr[$i] == "/")
+            array_unshift($priority, $i);
+          else
+            array_push($priority, $i);
+        }
+        $i = 0;
+        $answer = $args_arr[$priority[$i]+1];
+        for(; $i<count($sign_arr); $i++){
+          $args_arr[$priority[$i]] = answer($args_arr[$priority[$i]], $args_arr[$priority[$i]+1], $sign_arr[$priority[$i]]);
+          $args_arr[$priority[$i]+1] = $args_arr[$priority[$i]];
+        }
+        return $args_arr[$priority[$i-1]];
+      }
+
+      function sortz($str){
+        $start = strpos($str, "(");
+        $end = strpos($str, ")");
+        if($start!=false){
+          $sub = substr($str, $start+1, $end-$start-1);
+          $sub = sortz($sub);
+          fill($sub);
+          $buff = calculate();
+          $str = str_replace("(".$sub.")", $buff, $str);
+        }
+        return $str;
+      }
+    echo $problem." = ";
+    //fill all numbers and signs
+    $problem = sortz($problem);
+    fill($problem);
+    //calculate
+    echo calculate($args_arr, $sign_arr);
        ?>
 
   </body>
